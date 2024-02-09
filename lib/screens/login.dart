@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:get/get.dart";
 
 class login extends StatefulWidget {
@@ -12,6 +13,20 @@ class _loginState extends State<login> {
   final TextEditingController email = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  //get the user
+  void getUser() async {
+    CollectionReference accounts =
+        FirebaseFirestore.instance.collection("accounts");
+
+    QuerySnapshot response = await accounts.get();
+    if (response.docs.isNotEmpty) {
+      print(
+          "///////////////////////////${response.docs[0]}//////////////////////");
+      Get.offNamed("/addEvent");
+    } else {
+      print("No user");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +69,10 @@ class _loginState extends State<login> {
                         // Validate will return true if the form is valid, or false if
                         // the form is invalid.
                         if (_formKey.currentState!.validate()) {
-                          Get.offNamed("/addEvent");
-                          _formKey.currentState!.save();
-                          print('Form data saved');
+                          // Get.offNamed("/addEvent");
+                          // _formKey.currentState!.save();
+                          // print('Form data saved');
+                          getUser();
                         }
                       },
                       child: Text('Submit'),
