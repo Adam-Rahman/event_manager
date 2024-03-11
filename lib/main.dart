@@ -3,6 +3,7 @@ import "package:event_manager/screens/signup.dart";
 import "package:flutter/material.dart";
 import "package:firebase_core/firebase_core.dart";
 import "package:get/get.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:event_manager/screens/login.dart";
 
 void main() async {
@@ -19,9 +20,19 @@ void main() async {
 
 class myApp extends StatelessWidget {
   Widget build(BuildContext context) {
-    return GetMaterialApp(getPages: [
-      GetPage(name: "/addEvent", page: () => addEvent()),
-      GetPage(name: "/signup", page: () => signup())
-    ], theme: ThemeData(scaffoldBackgroundColor: Colors.amber), home: login());
+    return GetMaterialApp(
+      getPages: [
+        GetPage(name: "/addEvent", page: () => addEvent()),
+        GetPage(name: "/signup", page: () => signup()),
+        GetPage(
+          name: "/login",
+          page: () => login(),
+        )
+      ],
+      theme: ThemeData(scaffoldBackgroundColor: Colors.amber),
+      //if user is already signed in then take them to add event page
+      // else take them to login page
+      home: FirebaseAuth.instance.currentUser == null ? login() : addEvent(),
+    );
   }
 }

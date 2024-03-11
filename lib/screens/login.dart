@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:get/get.dart";
+import 'package:firebase_auth/firebase_auth.dart';
 
 class login extends StatefulWidget {
   @override
@@ -8,6 +9,19 @@ class login extends StatefulWidget {
 }
 
 class _loginState extends State<login> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('/////////////////////////////User is currently signed out!');
+      } else {
+        print('/////////////////////////////////////User is signed in!');
+      }
+    });
+  }
+
   final TextEditingController password = TextEditingController();
 
   final TextEditingController email = TextEditingController();

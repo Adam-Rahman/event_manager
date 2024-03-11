@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import "package:firebase_auth/firebase_auth.dart";
+import 'package:get/get.dart';
 
 class addEvent extends StatefulWidget {
   @override
@@ -27,6 +29,14 @@ class _addEventState extends State<addEvent> {
       ),
       appBar: AppBar(
         title: Text("Add Events"),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Get.offNamed("/login");
+              },
+              icon: const Icon(Icons.exit_to_app))
+        ],
       ),
       body: Center(
         child: Column(
