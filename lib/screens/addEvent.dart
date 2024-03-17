@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:get/get.dart';
@@ -9,7 +10,7 @@ class addEvent extends StatefulWidget {
 
 class _addEventState extends State<addEvent> {
   final TextEditingController time = TextEditingController();
-
+  final TextEditingController eventType = TextEditingController();
   final TextEditingController guest = TextEditingController();
 
   final TextEditingController date = TextEditingController();
@@ -136,13 +137,13 @@ class _addEventState extends State<addEvent> {
                     SizedBox(
                       height: 21.0,
                     ),
-                    DropdownButton(
-                      items: ["Wedding", "Birthday Party", "Conference"]
-                          .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (value) {},
-                    ),
+                    DropdownMenu(controller: eventType, dropdownMenuEntries: [
+                      DropdownMenuEntry(value: "Wedding", label: "Wedding"),
+                      DropdownMenuEntry(
+                          value: "Birthday Party", label: "Birthday Party"),
+                      DropdownMenuEntry(
+                          value: "Conference", label: "Conference"),
+                    ]),
                     SizedBox(
                       height: 15.0,
                     ),
@@ -152,8 +153,16 @@ class _addEventState extends State<addEvent> {
                         // the form is invalid.
                         if (_formKey.currentState!.validate()) {
                           print('Form data validated');
-                          _formKey.currentState!.save();
-                          print('Form data saved');
+
+                          // final TextEditingController name
+                          FirebaseFirestore.instance.collection("events").add({
+                            "userId": FirebaseAuth.instance.currentUser!.uid,
+                            "time": time.text,
+                            "eventType": eventType.text,
+                            "guestAmount": guest.text,
+                            "date": date.text,
+                            "eventName": name.text,
+                          });
                         }
                       },
                       child: Text('Submit'),

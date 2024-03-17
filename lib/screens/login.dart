@@ -1,3 +1,6 @@
+// ignore_for_file: camel_case_types, use_key_in_widget_constructors
+
+import "package:awesome_dialog/awesome_dialog.dart";
 import "package:flutter/material.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:get/get.dart";
@@ -27,20 +30,6 @@ class _loginState extends State<login> {
   final TextEditingController email = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  //get the user
-  void getUser() async {
-    CollectionReference accounts =
-        FirebaseFirestore.instance.collection("accounts");
-
-    QuerySnapshot response = await accounts.get();
-    if (response.docs.isNotEmpty) {
-      print(
-          "///////////////////////////${response.docs[0]}//////////////////////");
-      Get.offNamed("/addEvent");
-    } else {
-      print("No user");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,22 +68,46 @@ class _loginState extends State<login> {
                 Row(
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // Validate will return true if the form is valid, or false if
                         // the form is invalid.
                         if (_formKey.currentState!.validate()) {
-                          // Get.offNamed("/addEvent");
-                          // _formKey.currentState!.save();
                           // print('Form data saved');
-                          getUser();
+                          try {
+                            await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                                    email: email.text, password: password.text);
+                            Get.offNamed("/addEvent");
+                          } on FirebaseAuthException catch (e) {
+                            print(e);
+                            if (e.code == 'user-not-found') {
+                              print(
+                                  '//////////////////No user found for that email.');
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error',
+                                desc: 'No user found for that email.',
+                              ).show();
+                            } else if (e.code == 'wrong-password') {
+                              print('Wrong password provided for that user.');
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error',
+                                desc: 'Wrong password provided for that user.',
+                              ).show();
+                            }
+                          }
                         }
                       },
                       child: Text('Submit'),
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // Validate will return true if the form is valid, or false if
-                        // the form is invalid.
+                        //takes the user to signup page
 
                         Get.offNamed("/signup");
                       },
